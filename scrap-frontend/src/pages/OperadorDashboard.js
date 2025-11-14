@@ -2,14 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../services/api';
-import RegistroScrapCompleto from '../components/RegistroScrapCompleto';
+import EnhancedScrapForm from '../components/EnhancedScrapForm';
+import NavigationTabs from '../components/NavigationTabs';
+import StatCard from '../components/StatCard';
 
 const OperadorDashboard = () => {
-  const { user, logout } = useAuth();
-  const [showModal, setShowModal] = useState(false);
+  const { user } = useAuth();
   const [registros, setRegistros] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('registro');
   const [filtros, setFiltros] = useState({
     area: '',
     turno: '',
@@ -131,162 +133,138 @@ const OperadorDashboard = () => {
           <button onClick={generarReporteGeneral} style={styles.reporteButton}>
             📊 Generar Reporte PDF
           </button>
-          <button onClick={() => setShowModal(true)} style={styles.primaryButton}>
+          {/* 🆕 CAMBIAR: Este botón ahora se maneja en las tabs */}
+          {/* <button onClick={() => setShowModal(true)} style={styles.primaryButton}>
             ➕ Nuevo Registro
-          </button>
+          </button> */}
         </div>
       </div>
 
-      {/* Estadísticas */}
-      <section style={styles.statsSection}>
-        <h2>📈 Mis Estadísticas</h2>
-        <div style={styles.statsGrid}>
-          <div style={styles.statCard}>
-            <h3>📋 Total Registros</h3>
-            <p style={styles.statNumber}>{stats?.total_registros || 0}</p>
-          </div>
-          <div style={styles.statCard}>
-            <h3>⚖️ Peso Total</h3>
-            <p style={styles.statNumber}>{stats?.total_peso_kg || 0} kg</p>
-          </div>
-          <div style={styles.statCard}>
-            <h3>⏳ Pendientes</h3>
-            <p style={styles.statNumber}>{stats?.pendientes || 0}</p>
-          </div>
-          <div style={styles.statCard}>
-            <h3>⚖️ Con Báscula</h3>
-            <p style={styles.statNumber}>{stats?.registros_bascula || 0}</p>
-          </div>
-        </div>
+      {/* 🆕 NUEVO: Navigation Tabs */}
+      <NavigationTabs
+        userRole="operador"
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
-        {/* Distribución por Área */}
-        {stats?.por_area && stats.por_area.length > 0 && (
-          <div style={styles.areasSection}>
-            <h3>🏭 Distribución por Área</h3>
-            <div style={styles.areasGrid}>
-              {stats.por_area.map((area, index) => (
-                <div key={index} style={styles.areaCard}>
-                  <h4>{getAreaLabel(area.area_real)}</h4>
-                  <p>{area.total_kg} kg</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
+      {/* 🎯 AQUÍ VA EXACTAMENTE EL CÓDIGO QUE PREGUNTASTE */}
+      {activeTab === 'registro' && (
+        <EnhancedScrapForm />
+      )}
 
-      {/* Filtros */}
-      <section style={styles.filtrosSection}>
-        <h3>🔍 Filtros</h3>
-        <div style={styles.filtrosGrid}>
-          <div style={styles.filtroGroup}>
-            <label>Área:</label>
-            <select name="area" value={filtros.area} onChange={handleFiltroChange}>
-              <option value="">Todas las áreas</option>
-              <option value="TREFILADO">Trefilado</option>
-              <option value="BUNCHER">Buncher</option>
-              <option value="EXTRUSION">Extrusión</option>
-              <option value="XLPE">XLPE</option>
-              <option value="EBEAM">E-Beam</option>
-              <option value="RWD">Rewind</option>
-              <option value="OTHERS">Otros</option>
-            </select>
+      {activeTab === 'historial' && (
+        <section style={styles.registrosSection}>
+          <h2>📋 Mis Registros Recientes</h2>
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Fecha</th>
+                  <th style={styles.th}>Turno</th>
+                  <th style={styles.th}>Área/Máquina</th>
+                  <th style={styles.th}>Peso Total</th>
+                  <th style={styles.th}>Material</th>
+                  <th style={styles.th}>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {registros.map(registro => (
+                  <tr key={registro.id} style={styles.tr}>
+                    <td style={styles.td}>
+                      {new Date(registro.fecha_registro).toLocaleDateString()}
+                    </td>
+                    <td style={styles.td}>Turno {registro.turno}</td>
+                    <td style={styles.td}>
+                      <div>{getAreaLabel(registro.area_real)}</div>
+                      <div style={styles.maquina}>{registro.maquina_real}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <strong>{registro.peso_total} kg</strong>
+                    </td>
+                    <td style={styles.td}>{getMaterialLabel(registro.tipo_material)}</td>
+                    <td style={styles.td}>
+                      <span style={{
+                        ...styles.status,
+                        ...(registro.estado === 'pendiente' ? styles.pendiente : styles.recibido)
+                      }}>
+                        {registro.estado === 'pendiente' ? '⏳ Pendiente' : '✅ Recibido'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {registros.length === 0 && (
+              <div style={styles.emptyState}>
+                📝 No hay registros de scrap.
+              </div>
+            )}
           </div>
-          <div style={styles.filtroGroup}>
-            <label>Turno:</label>
-            <select name="turno" value={filtros.turno} onChange={handleFiltroChange}>
-              <option value="">Todos los turnos</option>
-              <option value="1">Turno 1</option>
-              <option value="2">Turno 2</option>
-              <option value="3">Turno 3</option>
-            </select>
-          </div>
-          <div style={styles.filtroGroup}>
-            <label>Fecha:</label>
-            <input
-              type="date"
-              name="fecha"
-              value={filtros.fecha}
-              onChange={handleFiltroChange}
+        </section>
+      )}
+
+      {activeTab === 'estadisticas' && (
+        <section style={styles.statsSection}>
+          <h2>📈 Mis Estadísticas</h2>
+          <div style={styles.statsGrid}>
+            <StatCard
+              title="Total Registros"
+              value={stats?.total_registros || 0}
+              icon="📋"
+              color="#007bff"
+            />
+            <StatCard
+              title="Peso Total"
+              value={`${stats?.total_peso_kg || 0} kg`}
+              icon="⚖️"
+              color="#28a745"
+            />
+            <StatCard
+              title="Pendientes"
+              value={stats?.pendientes || 0}
+              icon="⏳"
+              color="#ffc107"
+            />
+            <StatCard
+              title="Con Báscula"
+              value={stats?.registros_bascula || 0}
+              icon="🔌"
+              color="#17a2b8"
             />
           </div>
-          <div style={styles.filtroGroup}>
-            <button onClick={limpiarFiltros} style={styles.secondaryButton}>
-              🗑️ Limpiar
-            </button>
-          </div>
-        </div>
-      </section>
 
-      {/* Lista de Registros Recientes */}
-      <section style={styles.registrosSection}>
-        <h2>📋 Mis Registros Recientes</h2>
-        <div style={styles.tableContainer}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Fecha</th>
-                <th style={styles.th}>Turno</th>
-                <th style={styles.th}>Área/Máquina</th>
-                <th style={styles.th}>Peso Total</th>
-                <th style={styles.th}>Material</th>
-                <th style={styles.th}>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {registros.map(registro => (
-                <tr key={registro.id} style={styles.tr}>
-                  <td style={styles.td}>
-                    {new Date(registro.fecha_registro).toLocaleDateString()}
-                  </td>
-                  <td style={styles.td}>Turno {registro.turno}</td>
-                  <td style={styles.td}>
-                    <div>{getAreaLabel(registro.area_real)}</div>
-                    <div style={styles.maquina}>{registro.maquina_real}</div>
-                  </td>
-                  <td style={styles.td}>
-                    <strong>{registro.peso_total} kg</strong>
-                  </td>
-                  <td style={styles.td}>{getMaterialLabel(registro.tipo_material)}</td>
-                  <td style={styles.td}>
-                    <span style={{
-                      ...styles.status,
-                      ...(registro.estado === 'pendiente' ? styles.pendiente : styles.recibido)
-                    }}>
-                      {registro.estado === 'pendiente' ? '⏳ Pendiente' : '✅ Recibido'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {registros.length === 0 && (
-            <div style={styles.emptyState}>
-              📝 No hay registros de scrap. ¡Crea tu primer registro!
+          {/* Distribución por Área */}
+          {stats?.por_area && stats.por_area.length > 0 && (
+            <div style={styles.areasSection}>
+              <h3>🏭 Distribución por Área</h3>
+              <div style={styles.areasGrid}>
+                {stats.por_area.map((area, index) => (
+                  <div key={index} style={styles.areaCard}>
+                    <h4>{getAreaLabel(area.area_real)}</h4>
+                    <p>{area.total_kg} kg</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Modal para crear nuevo registro */}
-      {showModal && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
-            <div style={styles.modalHeader}>
-              <h3>📝 Nuevo Registro de Scrap</h3>
-              <button
-                onClick={() => setShowModal(false)}
-                style={styles.closeButton}
-              >
-                ✕
-              </button>
-            </div>
-            <div style={styles.modalContent}>
-              <RegistroScrapCompleto />
-            </div>
+      {activeTab === 'reportes' && (
+        <section style={styles.registrosSection}>
+          <h2>📄 Mis Reportes</h2>
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#6c757d' }}>
+            <h3>🚧 En Desarrollo</h3>
+            <p>La funcionalidad de reportes personalizados estará disponible próximamente.</p>
+            <button
+              onClick={generarReporteGeneral}
+              style={styles.reporteButton}
+            >
+              📊 Generar Reporte General PDF
+            </button>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

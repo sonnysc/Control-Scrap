@@ -1,4 +1,4 @@
-/* src/components/routes/UserManagment.js */
+/* src/components/UserManagment.js */
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../services/api';
 import { useAuth } from '../context/AuthContext';

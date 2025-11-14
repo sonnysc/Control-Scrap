@@ -1,4 +1,4 @@
-/* src/components/routes/Layout.js */
+/* src/components/Layout.js */
 
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
