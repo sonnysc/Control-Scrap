@@ -1,8 +1,7 @@
-/* src/App.js */
+// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { NotificationProvider } from './context/NotificationContext';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import OperadorDashboard from './pages/OperadorDashboard';
@@ -29,40 +28,45 @@ const HomeRedirect = () => {
 const App = () => {
   return (
     <Router>
-      <NotificationProvider>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<HomeRedirect />} />
-            <Route path="/login" element={<Login />} />
-            
-            <Route path="/admin/*" element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <Layout>
-                  <AdminDashboard />
-                </Layout>
-              </ProtectedRoute>
-            } />
+      <AuthProvider>
+        <Routes>
+          {/* Ruta raíz - redirección automática */}
+          <Route path="/" element={<HomeRedirect />} />
 
-            <Route path="/operador/*" element={
-              <ProtectedRoute allowedRoles={['operador']}>
-                <Layout>
-                  <OperadorDashboard />
-                </Layout>
-              </ProtectedRoute>
-            } />
+          {/* Ruta de login */}
+          <Route path="/login" element={<Login />} />
 
-            <Route path="/receptor/*" element={
-              <ProtectedRoute allowedRoles={['receptor']}>
-                <Layout>
-                  <ReceptorDashboard />
-                </Layout>
-              </ProtectedRoute>
-            } />
+          {/* Dashboard de administrador */}
+          <Route path="/admin/*" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AuthProvider>
-      </NotificationProvider>
+          {/* Dashboard de operador */}
+          <Route path="/operador/*" element={
+            <ProtectedRoute allowedRoles={['operador']}>
+              <Layout>
+                <OperadorDashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          {/* Dashboard de receptor - CORREGIDO */}
+          <Route path="/receptor/*" element={
+            <ProtectedRoute allowedRoles={['receptor']}>
+              <Layout>
+                <ReceptorDashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          {/* Redirección para rutas no encontradas */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 };

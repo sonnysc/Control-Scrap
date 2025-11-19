@@ -362,7 +362,6 @@ def main():
         sys.exit(1)
 
     comando = sys.argv[1]
-    detector = obtener_detector()
 
     try:
         if comando == 'listar_puertos':
@@ -370,6 +369,7 @@ def main():
             print(json.dumps(resultado))
 
         elif comando == 'conectar':
+            detector = obtener_detector()
             if len(sys.argv) >= 3:
                 puerto = sys.argv[2]
                 resultado = detector.detectar_y_conectar(puerto)
@@ -388,39 +388,20 @@ def main():
         elif comando == 'leer':
             detector = obtener_detector()
             
-            # VERIFICAR SI YA TENEMOS CONEXIÓN ACTIVA CON EL PUERTO SOLICITADO
-            puerto_solicitado = sys.argv[2] if len(sys.argv) >= 3 else None
-            
-            if (detector.conexion_activa and 
-                detector.conexion_activa.is_open and 
-                detector.puerto_activo == puerto_solicitado):
-                
-                # USAR CONEXIÓN PERSISTENTE
+            # Si tenemos conexión activa, usarla para lectura en tiempo real
+            if detector.conexion_activa and detector.conexion_activa.is_open:
                 resultado = detector.leer_peso_conexion_activa()
                 print(json.dumps(resultado))
-                
             else:
-                # Si no hay conexión activa o es diferente puerto, crear una nueva
-                if puerto_solicitado:
-                    print(f"🔄 Creando nueva conexión para {puerto_solicitado}", file=sys.stderr)
-                    # Primero cerrar conexión existente si hay
-                    if detector.conexion_activa:
-                        detector.cerrar_conexion()
-                    
-                    # Crear nueva conexión
-                    resultado_conexion = detector.detectar_y_conectar(puerto_solicitado)
-                    if resultado_conexion.get("success"):
-                        # Ahora leer usando la nueva conexión
-                        resultado = detector.leer_peso_conexion_activa()
-                        print(json.dumps(resultado))
-                    else:
-                        print(json.dumps(resultado_conexion))
+                # Fallback: modo una sola vez
+                if len(sys.argv) >= 3:
+                    puerto = sys.argv[2]
+                    baudios = int(sys.argv[3]) if len(sys.argv) >= 4 else None
+                    timeout = int(sys.argv[4]) if len(sys.argv) >= 5 else 1
+                    resultado = detector.leer_peso_una_vez(puerto, baudios, timeout)
+                    print(json.dumps(resultado))
                 else:
-                    print(json.dumps({
-                        "success": False, 
-                        "error": "Se requiere puerto para lectura",
-                        "requiere_conexion": True
-                    }))
+                    print(json.dumps({"success": False, "error": "Se requiere puerto para lectura única"}))
 
         elif comando == 'leer_continuo':
             detector = obtener_detector()
@@ -446,6 +427,7 @@ def main():
     except Exception as e:
         print(json.dumps({"success": False, "error": str(e)}), file=sys.stderr)
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
