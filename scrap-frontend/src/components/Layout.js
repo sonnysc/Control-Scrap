@@ -1,4 +1,4 @@
-/* src/components/Layout.js - COMPONENTE ÚNICO */
+/* src/components/Layout.js */
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 

@@ -1,4 +1,4 @@
-/* src/services/api.js - VERSIÓN LIMPIA */
+/* src/services/api.js */
 const API_BASE_URL = 'http://localhost:8000/api';
 
 const getAuthToken = () => localStorage.getItem('authToken');
@@ -15,6 +15,7 @@ export const apiClient = {
                 ...(token && { 'Authorization': `Bearer ${token}` }),
                 ...options.headers,
             },
+            credentials: 'include',
             ...options,
         };
 
@@ -23,6 +24,7 @@ export const apiClient = {
         }
 
         try {
+            console.log(`📤 API Request: ${url}`, config);
             const response = await fetch(url, config);
             
             if (response.status === 401) {
@@ -31,12 +33,16 @@ export const apiClient = {
             }
 
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`❌ API Error ${response.status}:`, errorText);
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
-            return await response.json();
+            const data = await response.json();
+            console.log(`✅ API Response: ${url}`, data);
+            return data;
         } catch (error) {
-            console.error(`Error en ${url}:`, error);
+            console.error(`💥 Error en ${url}:`, error);
             throw error;
         }
     },
@@ -83,7 +89,18 @@ export const apiClient = {
     },
 
     async createRegistroScrap(data) {
-        return this.request('/registros-scrap', { method: 'POST', body: data });
+        console.log('📤 Enviando datos al backend:', data);
+        try {
+            const response = await this.request('/registros-scrap', { 
+                method: 'POST', 
+                body: data 
+            });
+            console.log('✅ Respuesta del backend:', response);
+            return response;
+        } catch (error) {
+            console.error('❌ Error en createRegistroScrap:', error);
+            throw error;
+        }
     },
 
     async getRegistroScrapStats() {

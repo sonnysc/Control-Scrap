@@ -1,10 +1,9 @@
-// src/pages/OperadorDashboard.js - VERSIÓN CORREGIDA
+// src/pages/OperadorDashboard.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../services/api';
 import { useToast } from '../context/ToastContext';
-import RegistroScrapCompleto from '../components/RegistroScrapCompleto'; // Asegúrate de tener este componente actualizado
-
+import RegistroScrapCompleto from '../components/RegistroScrapCompleto';
 const OperadorDashboard = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
@@ -13,7 +12,7 @@ const OperadorDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cargandoRegistros, setCargandoRegistros] = useState(true);
-  
+
   const [filtros, setFiltros] = useState({ area: '', turno: '', fecha: '' });
 
   const loadOperadorData = useCallback(async () => {
@@ -62,7 +61,7 @@ const OperadorDashboard = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       addToast('Reporte PDF generado exitosamente', 'success');
     } catch (error) {
       addToast('Error generando reporte: ' + error.message, 'error');
@@ -84,7 +83,7 @@ const OperadorDashboard = () => {
           <h1 style={styles.title}>Dashboard Operador</h1>
           <p style={styles.subtitle}>Hola, {user.name}</p>
         </div>
-        <div style={{display: 'flex', gap: '10px'}}>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={generarReporteGeneral} style={styles.secondaryButton}>📄 Reporte PDF</button>
           <button onClick={() => setShowModal(true)} style={styles.primaryButton}>➕ Nuevo Registro</button>
         </div>
@@ -147,14 +146,14 @@ const OperadorDashboard = () => {
                   <td style={styles.td}>{r.maquina_real}</td>
                   <td style={styles.td}><strong>{r.peso_total} kg</strong></td>
                   <td style={styles.td}>
-                    {r.conexion_bascula ? 
-                      <span style={styles.badgeSuccess}>⚖️ Báscula</span> : 
+                    {r.conexion_bascula ?
+                      <span style={styles.badgeSuccess}>⚖️ Báscula</span> :
                       <span style={styles.badgeWarn}>✍️ Manual</span>
                     }
                   </td>
                 </tr>
               )) : (
-                <tr><td colSpan="6" style={{...styles.td, textAlign: 'center'}}>No hay registros</td></tr>
+                <tr><td colSpan="6" style={{ ...styles.td, textAlign: 'center' }}>No hay registros</td></tr>
               )}
             </tbody>
           </table>
@@ -165,17 +164,16 @@ const OperadorDashboard = () => {
       {showModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modal}>
-             <div style={styles.modalHeader}>
-                <h3>Nuevo Registro de Scrap</h3>
-                <button onClick={() => setShowModal(false)} style={styles.closeBtn}>×</button>
-             </div>
-             <div style={{padding: '0'}}> 
-               {/* Importante: El componente hijo maneja su propio padding si es necesario */}
-               <RegistroScrapCompleto 
-                  onRegistroCreado={handleRegistroCreado} 
-                  onCancelar={() => setShowModal(false)} 
-               />
-             </div>
+            <div style={styles.modalHeader}>
+              <h3>Registro Masivo de Scrap</h3>
+              <button onClick={() => setShowModal(false)} style={styles.closeBtn}>×</button>
+            </div>
+            <div style={{ padding: '0' }}>
+              <RegistroScrapCompleto
+                onRegistroCreado={handleRegistroCreado}
+                onCancelar={() => setShowModal(false)}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -185,169 +183,169 @@ const OperadorDashboard = () => {
 
 // ESTILOS OPERADOR
 const styles = {
-  container: { 
-    padding: '2rem', 
-    backgroundColor: '#F3F4F6', 
-    minHeight: '100vh' 
+  container: {
+    padding: '2rem',
+    backgroundColor: '#F3F4F6',
+    minHeight: '100vh'
   },
-  header: { 
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    marginBottom: '2rem' 
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '2rem'
   },
-  title: { 
-    fontSize: '1.5rem', 
-    fontWeight: '700', 
-    color: '#111827', 
-    margin: 0 
+  title: {
+    fontSize: '1.5rem',
+    fontWeight: '700',
+    color: '#111827',
+    margin: 0
   },
-  subtitle: { 
-    color: '#6B7280' 
+  subtitle: {
+    color: '#6B7280'
   },
-  loading: { 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    height: '100vh' 
+  loading: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh'
   },
-  gridStats: { 
-    display: 'grid', 
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-    gap: '1.5rem', 
-    marginBottom: '2rem' 
+  gridStats: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '1.5rem',
+    marginBottom: '2rem'
   },
-  statCard: { 
-    backgroundColor: 'white', 
-    padding: '1.5rem', 
-    borderRadius: '12px', 
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)' 
+  statCard: {
+    backgroundColor: 'white',
+    padding: '1.5rem',
+    borderRadius: '12px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
   },
-  statLabel: { 
-    fontSize: '0.875rem', 
-    color: '#6B7280', 
-    fontWeight: '500' 
+  statLabel: {
+    fontSize: '0.875rem',
+    color: '#6B7280',
+    fontWeight: '500'
   },
-  statNumber: { 
-    fontSize: '2rem', 
-    fontWeight: '700', 
-    color: '#111827', 
-    display: 'block', 
-    marginTop: '0.5rem' 
+  statNumber: {
+    fontSize: '2rem',
+    fontWeight: '700',
+    color: '#111827',
+    display: 'block',
+    marginTop: '0.5rem'
   },
-  card: { 
-    backgroundColor: 'white', 
-    borderRadius: '12px', 
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', 
-    overflow: 'hidden' 
+  card: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden'
   },
-  cardHeader: { 
-    padding: '1.5rem', 
-    borderBottom: '1px solid #E5E7EB', 
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    alignItems: 'center' 
+  cardHeader: {
+    padding: '1.5rem',
+    borderBottom: '1px solid #E5E7EB',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
-  filters: { 
-    display: 'flex', 
-    gap: '10px' 
+  filters: {
+    display: 'flex',
+    gap: '10px'
   },
-  smallSelect: { 
-    padding: '0.5rem', 
-    borderRadius: '6px', 
-    border: '1px solid #D1D5DB' 
+  smallSelect: {
+    padding: '0.5rem',
+    borderRadius: '6px',
+    border: '1px solid #D1D5DB'
   },
   tableContainer: { overflowX: 'auto' },
-  table: { 
-    width: '100%', 
-    borderCollapse: 'collapse' 
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse'
   },
-  th: { 
-    padding: '1rem', 
-    textAlign: 'left', 
-    fontSize: '0.75rem', 
-    fontWeight: '700', 
-    color: '#6B7280', 
-    textTransform: 'uppercase', 
-    backgroundColor: '#F9FAFB' 
+  th: {
+    padding: '1rem',
+    textAlign: 'left',
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    color: '#6B7280',
+    textTransform: 'uppercase',
+    backgroundColor: '#F9FAFB'
   },
-  tr: { 
-    borderBottom: '1px solid #E5E7EB', 
-    ':hover': { 
-      backgroundColor: '#F9FAFB' 
-    } 
+  tr: {
+    borderBottom: '1px solid #E5E7EB',
+    ':hover': {
+      backgroundColor: '#F9FAFB'
+    }
   },
-  td: { 
-    padding: '1rem', 
-    fontSize: '0.875rem', 
-    color: '#374151' 
+  td: {
+    padding: '1rem',
+    fontSize: '0.875rem',
+    color: '#374151'
   },
-  badgeSuccess: { 
-    backgroundColor: '#D1FAE5', 
-    color: '#065F46', 
-    padding: '4px 8px', 
-    borderRadius: '99px', 
-    fontSize: '0.75rem', 
-    fontWeight: '600' 
+  badgeSuccess: {
+    backgroundColor: '#D1FAE5',
+    color: '#065F46',
+    padding: '4px 8px',
+    borderRadius: '99px',
+    fontSize: '0.75rem',
+    fontWeight: '600'
   },
-  badgeWarn: { 
-    backgroundColor: '#FEF3C7', 
-    color: '#92400E', 
-    padding: '4px 8px', 
-    borderRadius: '99px', 
-    fontSize: '0.75rem', 
-    fontWeight: '600' 
+  badgeWarn: {
+    backgroundColor: '#FEF3C7',
+    color: '#92400E',
+    padding: '4px 8px',
+    borderRadius: '99px',
+    fontSize: '0.75rem',
+    fontWeight: '600'
   },
-  primaryButton: { 
-    backgroundColor: '#2563EB', 
-    color: 'white', 
+  primaryButton: {
+    backgroundColor: '#2563EB',
+    color: 'white',
     padding: '0.75rem 1.5rem',
-    borderRadius: '8px', 
-    border: 'none', 
-    fontWeight: '600', 
-    cursor: 'pointer' 
+    borderRadius: '8px',
+    border: 'none',
+    fontWeight: '600',
+    cursor: 'pointer'
   },
-  secondaryButton: { 
-    backgroundColor: 'white', 
-    color: '#374151', 
-    padding: '0.75rem 1.5rem', 
-    borderRadius: '8px', 
-    border: '1px solid #D1D5DB', 
-    fontWeight: '600', 
-    cursor: 'pointer' 
+  secondaryButton: {
+    backgroundColor: 'white',
+    color: '#374151',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '8px',
+    border: '1px solid #D1D5DB',
+    fontWeight: '600',
+    cursor: 'pointer'
   },
-  modalOverlay: { 
-    position: 'fixed', 
-    top: 0, 
-    left: 0, 
-    right: 0, 
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)', 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    zIndex: 50 
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 50
   },
-  modal: { 
-    backgroundColor: 'white', 
-    borderRadius: '12px', 
-    width: '95%', 
-    maxWidth: '900px', 
-    maxHeight: '95vh', 
-    overflowY: 'auto' 
+  modal: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    width: '95%',
+    maxWidth: '900px',
+    maxHeight: '95vh',
+    overflowY: 'auto'
   },
-  modalHeader: { 
+  modalHeader: {
     padding: '1.5rem',
-    borderBottom: '1px solid #E5E7EB', 
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    alignItems: 'center' 
+    borderBottom: '1px solid #E5E7EB',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
-  closeBtn: { 
-    background: 'none', 
-    border: 'none', 
-    fontSize: '1.5rem', 
-    cursor: 'pointer' 
+  closeBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1.5rem',
+    cursor: 'pointer'
   }
 };
 

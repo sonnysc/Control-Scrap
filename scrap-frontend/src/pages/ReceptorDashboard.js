@@ -1,11 +1,12 @@
+/* src/pages/ReceptorDashboard.js */
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../services/api';
-import { useToast } from '../context/ToastContext'; // ✅ Importar Hook
+import { useToast } from '../context/ToastContext'; 
 
 const ReceptorDashboard = () => {
   const { user } = useAuth();
-  const { addToast } = useToast(); // ✅ Inicializar Hook
+  const { addToast } = useToast(); 
   const [showModal, setShowModal] = useState(false);
   const [recepciones, setRecepciones] = useState([]);
   const [stock, setStock] = useState([]);
@@ -47,7 +48,7 @@ const ReceptorDashboard = () => {
       setStats(statsData);
       setStock(stockData);
     } catch (error) {
-      addToast('Error al cargar datos: ' + error.message, 'error'); // ✅ Toast Error
+      addToast('Error al cargar datos: ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -161,7 +162,6 @@ const ReceptorDashboard = () => {
         <div style={styles.cardHeader}>
           <h3>📋 Historial de Recepciones</h3>
           <div style={styles.filters}>
-             {/* Aquí podrías poner tus inputs de filtro si quieres que se vean en línea */}
           </div>
         </div>
         <div style={styles.tableContainer}>

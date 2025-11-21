@@ -64,6 +64,9 @@ class RegistrosScrapController extends Controller
 
     public function store(Request $request)
     {
+        // ✅ AGREGAR LOGGING PARA DEBUG
+        Log::info('📥 Datos recibidos en store:', $request->all());
+        
         // 1. Validación
         $validated = $request->validate([
             'turno' => 'required|in:1,2,3',
@@ -89,6 +92,8 @@ class RegistrosScrapController extends Controller
             'numero_lote' => 'nullable|string|max:50',
             'observaciones' => 'nullable|string'
         ]);
+
+        Log::info('✅ Datos validados:', $validated);
 
         DB::beginTransaction();
         try {
@@ -116,7 +121,7 @@ class RegistrosScrapController extends Controller
                 'turno' => $validated['turno'],
                 'area_real' => $validated['area_real'],
                 'maquina_real' => $validated['maquina_real'],
-                'tipo_material' => 'mixto', // Valor por defecto
+                // ❌ REMOVER 'tipo_material' => 'mixto', // Esta columna no existe
                 'conexion_bascula' => $validated['conexion_bascula'] ?? false,
                 'numero_lote' => $validated['numero_lote'] ?? null,
                 'observaciones' => $validated['observaciones'] ?? null,
@@ -132,10 +137,14 @@ class RegistrosScrapController extends Controller
 
             $datosGuardar['peso_total'] = $pesoTotal;
 
+            Log::info('💾 Datos a guardar en BD:', $datosGuardar);
+
             // 3. Crear el registro
             $registro = RegistrosScrap::create($datosGuardar);
 
             DB::commit();
+
+            Log::info('✅ Registro creado exitosamente ID: ' . $registro->id);
 
             return response()->json([
                 'message' => 'Registro de scrap guardado exitosamente',
@@ -145,7 +154,8 @@ class RegistrosScrapController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             // Esto escribirá el error real en storage/logs/laravel.log
-            Log::error('Error creando registro scrap: ' . $e->getMessage());
+            Log::error('❌ Error creando registro scrap: ' . $e->getMessage());
+            Log::error('📋 Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'message' => 'Error interno al guardar: ' . $e->getMessage()
             ], 500);

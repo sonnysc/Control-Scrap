@@ -1,11 +1,8 @@
-/* src/components/BasculaConnection.js - VERSIÓN FINAL CORREGIDA */
+/* src/components/BasculaConnection.js */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { apiClient } from '../services/api';
 
 const BasculaConnection = ({ onPesoObtenido, campoDestino = 'peso_cobre_estanado', modoInicial = "desconectado" }) => {
-    // ==========================================
-    // 1. LÓGICA DE ESTADO Y REFS (ORIGINAL)
-    // ==========================================
     const [estado, setEstado] = useState(modoInicial);
     const [peso, setPeso] = useState(0);
     const [config, setConfig] = useState({ puerto: 'COM3', baudios: 9600, timeout: 2 });

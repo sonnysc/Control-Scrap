@@ -1,8 +1,9 @@
+/* src/pages/AdminDashboard.js */
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../services/api';
 import { useToast } from '../context/ToastContext';
-import UserManagement from '../components/UserManagement'; // Asumiendo que también refactorizas este o lo dejas como está
+import UserManagement from '../components/UserManagement';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -17,7 +18,7 @@ const AdminDashboard = () => {
 
   const loadData = async () => {
     try {
-      const data = await apiClient.getDashboardStats(); // Asumiendo que tu API devuelve todo o usas Promise.all
+      const data = await apiClient.getDashboardStats(); 
       setStats(data);
     } catch (error) {
       addToast('Error cargando dashboard: ' + error.message, 'error');
@@ -41,7 +42,6 @@ const AdminDashboard = () => {
       {activeTab === 'overview' && (
         <>
           <div style={styles.gridStats}>
-            {/* Ejemplo de tarjetas estáticas si la API no devuelve todo, ajustar según tu respuesta de API real */}
             <div style={styles.statCard}>
               <span style={styles.statLabel}>Usuarios Totales</span>
               <span style={styles.statNumber}>{stats?.total_usuarios || 0}</span>
@@ -56,7 +56,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Aquí puedes agregar más secciones de gráficas o tablas resumen usando los mismos estilos */}
           <div style={styles.card}>
             <div style={styles.cardHeader}><h3>Actividad Reciente</h3></div>
             <div style={{ padding: '2rem', color: '#6B7280', textAlign: 'center' }}>
